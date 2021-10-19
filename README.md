@@ -24,7 +24,7 @@ This extension does not introduces any settings to vs code whatsoever.
 
 ## Known Issues
 
-There are many keywords to be added to extend the usability of this extension.
+There are many keywords to be added to extend the usability of this extension(<a href="https://github.com/homeboy445/auto-Include/issues/3">ticket</a>).
 
 ## Release Notes
 
