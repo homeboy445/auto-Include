@@ -1,4 +1,14 @@
+const IsKeyWord = (word, keywords) => {
+  for (const key in keywords) {
+    if (word.lastIndexOf(key) !== -1) {
+      return keywords[key];
+    }
+  }
+  return "*";
+};
+
 const RemoveUnusedHeaders = (words, keywords) => {
+  words = ["@"].concat(words);
   const find = (headerArray, target) => {
     /* 
          This function will check if any keyword belonging to a particular
@@ -27,9 +37,12 @@ const RemoveUnusedHeaders = (words, keywords) => {
     iterator = item === "using" ? index : iterator;
     if (item.lastIndexOf("#") !== -1) {
       let lineStr = "";
-      for (let i = index; i < item.length; i++) {
+      for (let i = index; i < words.length; i++) {
         if (words[i] === "@") {
           break;
+        }
+        if (words[i] === "$%") {
+          continue;
         }
         lineStr += words[i];
       }
@@ -49,8 +62,8 @@ const RemoveUnusedHeaders = (words, keywords) => {
   let exclude = new Set();
   [...includedHeaders].map((item) => {
     let flag = false;
-    for (iterator; iterator < words.length; iterator++) {
-      flag |= find(headerObject[item.header], words[iterator]);
+    for (let it = iterator; it < words.length; it++) {
+      flag |= find(headerObject[item.header], words[it]);
     }
     if (!flag) {
       exclude.add(item.index);
@@ -76,15 +89,16 @@ const RemoveUnusedHeaders = (words, keywords) => {
     }
   });
   let finalCode = "";
-  words.map((item) => {
-    if (item === "~~") {
+  words.map((item, index) => {
+    if (item === "~~" || index === 0) {
       return null;
     }
-    finalCode += item === "@" ? "\n" : item === "@$%" ? " " : item;
+    finalCode += item === "@" ? "\n" : item === "$%" ? " " : item;
   });
   return finalCode;
 };
 
 module.exports = {
   RemoveUnusedHeaders,
+  IsKeyWord
 };
