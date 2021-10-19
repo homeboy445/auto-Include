@@ -1,12 +1,11 @@
 const vscode = require("vscode");
 const { keywords } = require("./keywords");
-const { RemoveUnusedHeaders, IsKeyWord } = require("./Utility");
+const { RemoveUnusedHeaders, IsKeyWord } = require("./utility");
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  console.log("ACTIVE");
   let disposable = vscode.commands.registerCommand(
     "autoinclude.autoInclude",
     function () {
@@ -20,7 +19,7 @@ function activate(context) {
         for (let i = 0, n = text.length; i < n; i++) {
           if (text[i] === "\n" || text[i] === " ") {
             let value = IsKeyWord(s, keywords);
-            if (value !== '*') {
+            if (value !== "*") {
               headers.add(value);
             }
             words.push(s);
@@ -57,9 +56,12 @@ function activate(context) {
         editor.edit((editBuilder) =>
           editBuilder.replace(editor.selection, str + text)
         );
+        editor.document.save().then(() => {
+          vscode.window.showInformationMessage("Done!");
+        });
         vscode.commands.executeCommand("cursorMove", { to: "viewPortTop" });
+        vscode.commands.executeCommand("editor.action.save");
       });
-      vscode.window.showInformationMessage("Done!");
     }
   );
 
