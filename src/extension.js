@@ -42,7 +42,6 @@ function activate(context) {
           });
         }
         text = RemoveUnusedHeaders(words, keywords);
-        console.log(text);
         let str = "";
         [...headers].map((item) => {
           let flag = true;
