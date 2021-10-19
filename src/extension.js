@@ -1,18 +1,17 @@
 const vscode = require("vscode");
 const { keywords } = require("./keywords");
-const { RemoveUnusedHeaders, IsKeyWord } = require("./Utility");
+const { RemoveUnusedHeaders, IsKeyWord } = require("./utility");
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  console.log("ACTIVE");
   let disposable = vscode.commands.registerCommand(
     "autoinclude.autoInclude",
     function () {
       const editor = vscode.window.activeTextEditor;
       vscode.commands.executeCommand("editor.action.selectAll").then(() => {
-        vscode.window.showInformationMessage("Including required libraries...");
+        vscode.window.showInformationMessage("Including required libraries & removing unused ones...");
         let text = editor.document.getText(editor.selection);
         let headers = new Set(),
           s = "",
@@ -20,7 +19,7 @@ function activate(context) {
         for (let i = 0, n = text.length; i < n; i++) {
           if (text[i] === "\n" || text[i] === " ") {
             let value = IsKeyWord(s, keywords);
-            if (value !== '*') {
+            if (value !== "*") {
               headers.add(value);
             }
             words.push(s);
@@ -57,9 +56,12 @@ function activate(context) {
         editor.edit((editBuilder) =>
           editBuilder.replace(editor.selection, str + text)
         );
+        editor.document.save().then(() => {
+          vscode.window.showInformationMessage("Done!");
+        });
         vscode.commands.executeCommand("cursorMove", { to: "viewPortTop" });
+        vscode.commands.executeCommand("editor.action.save");
       });
-      vscode.window.showInformationMessage("Done!");
     }
   );
 
