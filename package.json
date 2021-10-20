@@ -3,37 +3,25 @@
 	"displayName": "autoInclude",
 	"publisher": "homeboy445",
 	"description": "Automatically include & remove C++ headers accordingly.",
-	"icon": "icon.png",
-	"author":{
-		"name":"homeboy445"
-	},
 	"repository": {
-		"type": "git",
 		"url": "https://github.com/homeboy445/auto-Include"
 	},
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"engines": {
-		"vscode": "^1.61.0"
+		"vscode": "^1.52.0"
 	},
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
 		"onCommand:autoinclude.autoInclude"
 	],
-	"main": "./src/extension.js",
+	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "autoinclude.autoInclude",
 				"title": "auto Include"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "autoinclude.autoInclude",
-				"key": "ctrl+a+l",
-				"mac": "shift+a+l"
 			}
 		]
 	},
