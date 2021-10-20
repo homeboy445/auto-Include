@@ -1,4 +1,4 @@
-# autoinclude README
+# autoinclude
 
 Automatically include & remove C++ headers accordingly to your use-case. Now, you don't have to worry about all those headers that you constantly need to include or remove, this extension will do all that for you - giving you a smooth C++ programming experience.
 
