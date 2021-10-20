@@ -4,12 +4,16 @@ const { RemoveUnusedHeaders, IsKeyWord } = require("./utility");
 
 /**
  * @param {vscode.ExtensionContext} context
+ * 
  */
 function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "autoinclude.autoInclude",
     function () {
       const editor = vscode.window.activeTextEditor;
+      if (editor.document.languageId !== "cpp"){
+        return vscode.window.showInformationMessage("File type not supported!");
+      }
       vscode.commands.executeCommand("editor.action.selectAll").then(() => {
         vscode.window.showInformationMessage("Including required libraries & removing unused ones...");
         let text = editor.document.getText(editor.selection);
