@@ -17,9 +17,13 @@ const RemoveUnusedHeaders = (words, keywords) => {
          matches and will remain true (since true | false = true);
     */
     let flag = false;
-    headerArray.map((item) => {
-      flag |= target.lastIndexOf(item) !== -1;
-    });
+    try {
+      (headerArray || []).map((item) => {
+        flag |= target.lastIndexOf(item) !== -1;
+      });
+    } catch (e) {
+      return false;
+    }
     return flag;
   };
 
@@ -69,7 +73,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
       exclude.add(item.index);
     }
   });
-  [...exclude].map((item) => {
+  ([...exclude] || []).map((item) => {
     let prev = 0,
       nxt = 0;
     for (let i = item; i >= 0; i--) {
@@ -100,5 +104,5 @@ const RemoveUnusedHeaders = (words, keywords) => {
 
 module.exports = {
   RemoveUnusedHeaders,
-  IsKeyWord
+  IsKeyWord,
 };
