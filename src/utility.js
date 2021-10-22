@@ -39,7 +39,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
   let iterator = 0;
   words.map((item, index) => {
     iterator = item === "using" ? index : iterator;
-    if (item.lastIndexOf("#") !== -1) {
+    if (item.lastIndexOf("#include") !== -1) {
       let lineStr = "";
       for (let i = index; i < words.length; i++) {
         if (words[i] === "@") {

@@ -6,6 +6,7 @@
 	"repository": {
 		"url": "https://github.com/homeboy445/auto-Include"
 	},
+	"icon":"icon.png",
 	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.61.0"
