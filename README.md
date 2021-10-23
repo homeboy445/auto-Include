@@ -2,7 +2,9 @@
 
 Automatically include & remove C++ headers accordingly to your use-case. Now, you don't have to worry about all those headers that you constantly need to include or remove, this extension will do all that for you - giving you a smooth C++ programming experience.
 
-#### Note: This extension is still under development & needs extensive testing before it can be considered fully working and so, it might show some unexpected behavior on execution.
+### Note: This extension's current support is limited to pre-defined C++ headers only.
+
+### Caution: This extension is still under development & needs extensive testing before it can be considered fully working and so, it might show some unexpected behavior on execution.
 
 ## Features
 
