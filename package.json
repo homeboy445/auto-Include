@@ -1,13 +1,13 @@
 {
 	"name": "autoinclude",
-	"displayName": "autoInclude",
+	"displayName": "auto Include",
 	"publisher": "homeboy445",
 	"description": "Automatically include & remove C++ headers accordingly.",
 	"repository": {
 		"url": "https://github.com/homeboy445/auto-Include"
 	},
 	"icon":"icon.png",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"engines": {
 		"vscode": "^1.61.0"
 	},
