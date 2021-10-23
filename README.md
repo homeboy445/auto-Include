@@ -1,8 +1,8 @@
-# autoinclude
+# auto Include
 
 Automatically include & remove C++ headers accordingly to your use-case. Now, you don't have to worry about all those headers that you constantly need to include or remove, this extension will do all that for you - giving you a smooth C++ programming experience.
 
-#### Note: This extension is still under development & needs extensive testing before it can be considered fully working. So, it currently might show some unexpected behavior.
+#### Note: This extension is still under development & needs extensive testing before it can be considered fully working and so, it might show some unexpected behavior on execution.
 
 ## Features
 
@@ -15,6 +15,8 @@ Automatically include & remove C++ headers accordingly to your use-case. Now, yo
 ![video3](https://user-images.githubusercontent.com/61937872/137953616-40310bc8-ec8a-42bc-910d-59f70a8c3a50.gif)
 <br />
 
+## Usage
+Just do `ctrl + shift + p` and choose `auto Include` and you're done(make sure the file type is cpp only).
 
 ## Requirements
 
