@@ -38,6 +38,10 @@ There are many keywords to be added to extend the usability of this extension(<a
 
 Initial release of autoinclude.
 
+### 1.0.1
+
+No new changes but some fixes.
+
 ## Report bug or any unexpected behavior
 Please feel free to report any encountered bug or any suggestions on the source code repo: https://github.com/homeboy445/auto-Include. It would be of great help!
 
