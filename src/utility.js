@@ -110,8 +110,43 @@ const RemoveUnusedHeaders = (words, keywords) => {
   return finalCode;
 };
 
+const TextToWordsArray = (text, keywords) => {
+/**
+ * This function will return the array of words of text,
+ * it seperates word on the basis of spaces and new-line.
+ * some notations used in this function:
+ *          @  : \n
+ *          $% : " "(space)
+ */
+  let word = "", words = [];
+  for (let i = 0, n = text.length; i < n; i++) {
+    if (text[i] === "\n" || text[i] === " ") {
+      let value = IsKeyWord(word, keywords);
+      if (value !== "*") {
+        headers.add(value);
+      }
+      words.push(word);
+      if (text[i] === "\n") {
+        words.push("@");
+      }
+      if (text[i] === " ") {
+        words.push("$%");
+      }
+      word = "";
+      continue;
+    }
+    word += text[i];
+  }
+  return words;
+}
+
+const ClassifyClassesAndMethods = (text) =>{
+  return;
+} 
+
 module.exports = {
   Main,
   RemoveUnusedHeaders,
   IsKeyWord,
+  TextToWordsArray
 };

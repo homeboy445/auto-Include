@@ -1,6 +1,10 @@
 const vscode = require("vscode");
 const { keywords } = require("./keywords");
-const { RemoveUnusedHeaders, IsKeyWord } = require("./utility");
+const {
+  RemoveUnusedHeaders,
+  IsKeyWord,
+  TextToWordsArray,
+} = require("./utility");
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -20,26 +24,7 @@ function activate(context) {
         );
         let text = editor.document.getText(editor.selection);
         let headers = new Set(),
-          word = "",
-          words = [];
-        for (let i = 0, n = text.length; i < n; i++) {
-          if (text[i] === "\n" || text[i] === " ") {
-            let value = IsKeyWord(word, keywords);
-            if (value !== "*") {
-              headers.add(value);
-            }
-            words.push(word);
-            if (text[i] === "\n") {
-              words.push("@");
-            }
-            if (text[i] === " ") {
-              words.push("$%");
-            }
-            word = "";
-            continue;
-          }
-          word += text[i];
-        }
+          words = TextToWordsArray(text);
         for (const key in keywords) {
           words.map((item) => {
             if (item.lastIndexOf(key) !== -1) {
