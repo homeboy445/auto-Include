@@ -7,15 +7,6 @@ const IsKeyWord = (word, keywords) => {
   return "*";
 };
 
-const isPredefinedHeader = (header, headerObject) =>{
-  for (const key in headerObject){
-    if (key === header){
-      return true;
-    }
-  }
-  return false;
-}
-
 const RemoveUnusedHeaders = (words, keywords) => {
   words = ["@"].concat(words);
   const find = (headerArray, target) => {
@@ -66,7 +57,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
         }
         header += lineStr[k];
       }
-      if (header !== "iostream" && isPredefinedHeader(header, headerObject)) {
+      if (header !== "iostream" && headerObject[header] !== undefined) {
         includedHeaders.add({ header: header, index: index });
       }
     }
