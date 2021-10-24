@@ -7,7 +7,7 @@
 		"url": "https://github.com/homeboy445/auto-Include"
 	},
 	"icon":"icon.png",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"engines": {
 		"vscode": "^1.61.0"
 	},

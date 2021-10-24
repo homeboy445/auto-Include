@@ -24,7 +24,7 @@ function activate(context) {
           words = [];
         for (let i = 0, n = text.length; i < n; i++) {
           if (text[i] === "\n" || text[i] === " ") {
-            let value = IsKeyWord(s, keywords);
+            let value = IsKeyWord(word, keywords);
             if (value !== "*") {
               headers.add(value);
             }
