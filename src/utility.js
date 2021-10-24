@@ -1,3 +1,11 @@
+class Main
+{
+  constructor(name, type){
+    this.name = name;
+    this.type = type;
+  }
+}
+
 const IsKeyWord = (word, keywords) => {
   for (const key in keywords) {
     if (word.lastIndexOf(key) !== -1) {
@@ -103,6 +111,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
 };
 
 module.exports = {
+  Main,
   RemoveUnusedHeaders,
   IsKeyWord,
 };

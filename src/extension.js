@@ -4,21 +4,23 @@ const { RemoveUnusedHeaders, IsKeyWord } = require("./utility");
 
 /**
  * @param {vscode.ExtensionContext} context
- * 
+ *
  */
 function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "autoinclude.autoInclude",
     function () {
       const editor = vscode.window.activeTextEditor;
-      if (editor.document.languageId !== "cpp"){
+      if (editor.document.languageId !== "cpp") {
         return vscode.window.showInformationMessage("File type not supported!");
       }
       vscode.commands.executeCommand("editor.action.selectAll").then(() => {
-        vscode.window.showInformationMessage("Including required libraries & removing unused ones...");
+        vscode.window.showInformationMessage(
+          "Including required libraries & removing unused ones..."
+        );
         let text = editor.document.getText(editor.selection);
         let headers = new Set(),
-          s = "",
+          word = "",
           words = [];
         for (let i = 0, n = text.length; i < n; i++) {
           if (text[i] === "\n" || text[i] === " ") {
@@ -26,17 +28,17 @@ function activate(context) {
             if (value !== "*") {
               headers.add(value);
             }
-            words.push(s);
+            words.push(word);
             if (text[i] === "\n") {
               words.push("@");
             }
             if (text[i] === " ") {
               words.push("$%");
             }
-            s = "";
+            word = "";
             continue;
           }
-          s += text[i];
+          word += text[i];
         }
         for (const key in keywords) {
           words.map((item) => {
