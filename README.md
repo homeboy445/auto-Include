@@ -42,6 +42,10 @@ Initial release of autoinclude.
 
 No new changes but some fixes.
 
+### 1.0.2
+
+Fixed the problem of abruptly excluding programmer-defined headers on execution
+
 ## Report bug or any unexpected behavior
 Please feel free to report any encountered bug or any suggestions on the source code repo: https://github.com/homeboy445/auto-Include. It would be of great help!
 

@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "autoinclude" extension will be documented in this file.
+#### Initial Release
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+#### Version 1.0.1
+- Fixed some minor bugs
 
-## [Unreleased]
-
-- Initial release
+#### Version 1.0.2
+- Fixed the problem of excluding the programmer-defined headers abruptly. 
