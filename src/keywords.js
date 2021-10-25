@@ -11,6 +11,8 @@ const keywords = {
   floor: "cmath",
   abs: "cmath",
   round: "cmath",
+  upper_bound: "algorithm",
+  lower_bound: "algorithm",
   max_element: "algorithm",
   min_element: "algorithm",
   count: "algorithm",

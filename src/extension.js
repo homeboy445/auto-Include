@@ -2,9 +2,12 @@ const vscode = require("vscode");
 const { keywords } = require("./keywords");
 const {
   RemoveUnusedHeaders,
-  IsKeyWord,
   TextToWordsArray,
+  ClassifyClassesAndStructs,
+  CollectAllIdentifiers,
 } = require("./utility");
+const fs = require("fs");
+const path = require("path");
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -33,6 +36,12 @@ function activate(context) {
           });
         }
         text = RemoveUnusedHeaders(words, keywords);
+        let parentIdentifiers = ClassifyClassesAndStructs(words);
+        CollectAllIdentifiers(fs, path, editor.document.uri.path).then(
+          (response) => {
+            console.log("==>", response); //TODO: Begin working on this...
+          }
+        );
         let str = "";
         [...headers].map((item) => {
           let flag = true;
