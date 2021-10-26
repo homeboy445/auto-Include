@@ -20,7 +20,7 @@ const IsKeyWord = (word, keywords) => {
 
 const RemoveUnusedHeaders = (words, keywords) => {
   /**
-   * This function mainly aims at removing any and all headers are not in
+   * This function mainly aims at removing any and all headers that are not
    * currently in the program.
    */
   words = ["@"].concat(words);
@@ -225,7 +225,7 @@ const getDirContents = (fs, path, dirname) => {
 const SpreadArray = (arr, res) => {
   /**
    *  This is a utility function to spread sub-arrays and
-   *  append there content to the main array.
+   *  append their content to the main array.
    */
   try {
     arr.map((item) => {
@@ -244,7 +244,7 @@ const CollectAllIdentifiers = (fs, path, dirname) => {
   /*
     This function mainly collects class & Struct names from
     headers file that currently exists within the same directory
-    or within any sub-directory.
+    and within any sub-directory.
   */
   let dirContents = SpreadArray(getDirContents(fs, path, dirname), [])[0];
   let fileObj = {};
