@@ -5,6 +5,8 @@ const {
   TextToWordsArray,
   ClassifyClassesAndStructs,
   CollectAllIdentifiers,
+  getVariablesObject,
+  checkType,
 } = require("./utility");
 const fs = require("fs");
 const path = require("path");
@@ -28,20 +30,19 @@ function activate(context) {
         let text = editor.document.getText(editor.selection);
         let headers = new Set(),
           words = TextToWordsArray(text);
+        let variablesObj = getVariablesObject(words);
+        console.log(variablesObj);
         for (const key in keywords) {
-          words.map((item) => {
-            if (item.lastIndexOf(key) !== -1) {
-              headers.add(keywords[key]);
+          words.map((item, index) => {
+            let foundAt = item.lastIndexOf(key);
+            if (foundAt !== -1) {
+              if (checkType(words, keywords[key], index)) {
+                headers.add(keywords[key].header);
+              }
             }
           });
         }
         text = RemoveUnusedHeaders(words, keywords);
-        let parentIdentifiers = ClassifyClassesAndStructs(words);
-        CollectAllIdentifiers(fs, path, editor.document.uri.path).then(
-          (response) => {
-            console.log("==>", response); //TODO: Begin working on this...
-          }
-        );
         let str = "";
         [...headers].map((item) => {
           let flag = true;

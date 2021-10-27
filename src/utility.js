@@ -1,3 +1,4 @@
+/** Class for handling identifiers. */
 class Main {
   constructor(name, type) {
     this.name = name;
@@ -5,36 +6,30 @@ class Main {
   }
 }
 
-const IsKeyWord = (word, keywords) => {
-  /**
-   *  This function checks if a word exist as a sub-string
-   *  in any of the keywords.
-   */
-  for (const key in keywords) {
-    if (word.lastIndexOf(key) !== -1) {
-      return keywords[key];
-    }
-  }
-  return "*";
-};
-
+/**
+ * This function mainly aims at removing any and all headers that are not
+ * currently being used in the program.
+ * @param {*} words
+ * @param {*} keywords
+ * @returns String
+ */
 const RemoveUnusedHeaders = (words, keywords) => {
-  /**
-   * This function mainly aims at removing any and all headers that are not
-   * currently in the program.
-   */
   words = ["@"].concat(words);
-  const find = (headerArray, target) => {
+  const find = (header, headerArray, target, index) => {
     /*
-         This function will check if any keyword belonging to a particular
-         header is within the target string. the method to acheive the former
-         is via using OR operation which will toggle the flag to true if the
-         keyword matches and will remain true (since true | false = true);
+        This function will check if any keyword belonging to a particular
+        header is within the target string. the method to acheive the former
+        is via using OR operation which will toggle the flag to true if the
+        keyword matches and will remain true (since true | false = true);
     */
     let flag = false;
     try {
       (headerArray || []).map((item) => {
-        flag |= target.lastIndexOf(item) !== -1;
+        if (target.lastIndexOf(item.element) !== -1) {
+          if (checkType(words, { header: header, type: item.type }, index)) {
+            flag = true;
+          }
+        }
       });
     } catch (e) {
       return false;
@@ -46,9 +41,14 @@ const RemoveUnusedHeaders = (words, keywords) => {
   let headerObject = {};
   for (const key in keywords) {
     try {
-      headerObject[keywords[key]].push(key);
+      headerObject[keywords[key].header].push({
+        element: key,
+        type: keywords[key].type,
+      });
     } catch (e) {
-      headerObject[keywords[key]] = [key];
+      headerObject[keywords[key].header] = [
+        { element: key, type: keywords[key].type },
+      ];
     }
   }
   let iterator = 0;
@@ -82,7 +82,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
   [...includedHeaders].map((item) => {
     let flag = false;
     for (let it = iterator; it < words.length; it++) {
-      flag |= find(headerObject[item.header], words[it]);
+      flag |= find(item.header, headerObject[item.header], words[it], it);
     }
     if (!flag) {
       exclude.add(item.index);
@@ -117,22 +117,89 @@ const RemoveUnusedHeaders = (words, keywords) => {
   return finalCode;
 };
 
-const TextToWordsArray = (text, keywords) => {
-  /**
-   * This function will return the array of words of text,
-   * it seperates word on the basis of spaces and new-line.
-   * some notations used in this function:
-   *          @  : \n
-   *          $% : " "(space)
-   */
+/**
+ * This function checks if the matched substring is actually a keyword
+ * or not.
+ * @param {*} words
+ * @param {*} keyword
+ * @param {*} index
+ * @returns boolean
+ */
+const checkType = (words, keyword, index) => {
+  switch (keyword.type) {
+    case 0: {
+      let it,
+        str = "";
+      for (it = index; it < words.length; it++) {
+        str += words[it];
+        if (words[it].lastIndexOf(";") !== -1) {
+          break;
+        }
+      }
+      let stack = [],
+        flag = false;
+      for (let it = 0; it < str.length; it++) {
+        flag |= str[it] === "<" || str[it] === ">";
+        if (str[it] === "<") {
+          stack.push("<");
+        }
+        if (str[it] === ">") {
+          if (stack[stack.length - 1] === "<") {
+            stack.pop();
+          } else {
+            stack.push(">");
+          }
+        }
+      }
+      if (flag) {
+        if (stack.length === 0) {
+          return true;
+        }
+      }
+      break;
+    }
+    case 1: {
+      let s = "";
+      if (item.lastIndexOf("::") !== -1) {
+        let it = index - 1;
+        while (it >= 0) {
+          if (words[it] === " ") {
+            continue;
+          }
+          s = words[it];
+          break;
+        }
+        s += "::";
+      }
+      if (
+        key.length === item.length ||
+        s === "std::" ||
+        item.slice(0, item.length - key.length) === "std::"
+      ) {
+        return true;
+      }
+      break;
+    }
+    case 2: {
+      break;
+    }
+  }
+  return false;
+};
+
+/**
+ * This function will return the array of words within the
+ * input text, it seperates word on the basis of spaces and new-line.
+ * some notations used in this function:
+ * '@': "\n", '$%': " "(space)
+ * @param {*} text
+ * @returns Array
+ */
+const TextToWordsArray = (text) => {
   let word = "",
     words = [];
   for (let i = 0, n = text.length; i < n; i++) {
     if (text[i] === "\n" || text[i] === " ") {
-      let value = IsKeyWord(word, keywords);
-      if (value !== "*") {
-        headers.add(value);
-      }
       words.push(word);
       if (text[i] === "\n") {
         words.push("@");
@@ -148,11 +215,191 @@ const TextToWordsArray = (text, keywords) => {
   return words;
 };
 
+/**
+ * This function return an object of all the variables & identifiers
+ * used in the program.
+ * @param {*} words
+ * @returns boolean
+ */
+const getVariablesObject = (words) => {
+  const isValidVariable = (variable) => {
+    if (variable === undefined || variable.trim() === "") {
+      return false;
+    }
+    for (let i = 0; i < variable.length; i++) {
+      if (
+        variable[i] === "_" ||
+        variable.match(/^([0-9]|[a-z])+([0-9a-z]+)$/i) ||
+        variable.toLowerCase() != variable.toUpperCase()
+      ) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const getDataType = (type) => {
+    let idx = type.lastIndexOf("::");
+    if (idx !== -1) {
+      type = type.slice(idx + 2);
+    }
+    if (type.lastIndexOf("<") !== -1) {
+      let ss = "";
+      for (let i = 0; i < type.length; i++) {
+        if (type[i] === "<") {
+          break;
+        }
+        ss += type[i];
+      }
+      type = ss;
+    }
+    return type;
+  };
+
+  let variablesObj = {},
+    varArr = [];
+  let lim = -1;
+  words.map((item, index) => {
+    if (
+      item[0] === "#" ||
+      item === "@" ||
+      item === "$%" ||
+      index <= lim ||
+      item === "" ||
+      item === "return" ||
+      item === "using" ||
+      item === "typedef" ||
+      item === "namespace"
+    ) {
+      return null;
+    }
+    let it = index + 1,
+      varString = "",
+      flag = false;
+    for (; it < words.length; it++) {
+      if (words[it].lastIndexOf(";") !== -1) {
+        flag = true;
+        varString += words[it];
+        break;
+      }
+      if (words[it] === "@" || words[it] === ">>" || words[it] === "<<") {
+        break;
+      }
+      varString += words[it];
+    }
+    if (!flag) {
+      return null;
+    }
+    lim = it;
+    varArr.push([item, varString]);
+  });
+  varArr.map((item1) => {
+    //Possible variable candidates...
+    const [type, item] = item1;
+    let varStr = "";
+    if (item.lastIndexOf("{") !== -1) {
+      let open = [];
+      for (let i = 0; i < item.length; i++) {
+        if (item[i] === "{" || item[i] === "}") {
+          varStr += item[i];
+          open.push(item[i]);
+          continue;
+        }
+        if (item[i] === ",") {
+          //Just to avoid confilicting between a variable seperator & a value seperator
+          if (open.length > 0) {
+            if (open[0] === "{" && open.length === 1) {
+              //This signifies that the bracket is open.
+              varStr += "#";
+            } else if (open[0] === "{" && open[1] === "}") {
+              //This signifies that the bracket is closed.
+              open = [];
+              varStr += item[i];
+            }
+          } else {
+            varStr += item[i];
+          }
+        } else {
+          varStr += item[i];
+        }
+      }
+    }
+    if (varStr === "") {
+      varStr = item;
+    }
+    let arr = varStr.split(",");
+    arr = arr.map((item) => {
+      item = item.replace(/#/g, ",");
+      let variable = item.split("=")[0];
+      variable = variable.split("$%");
+      if (variable.length === 3) {
+        variable = variable[1];
+      } else {
+        let type_ = "",
+          var_ = "";
+        for (let it = variable.length - 1; it >= 0; it--) {
+          if (variable[it] !== "") {
+            if (var_ === "") {
+              var_ = variable[it];
+            } else {
+              type_ = variable[it];
+              break;
+            }
+          }
+        }
+        let flag = true; //TODO: Devise a better algorithm maybe?
+        for (let i = 0; i < type_.length; i++) {
+          if (type_[i].toLowerCase() === type_[i].toUpperCase()) {
+            flag = false;
+            break;
+          }
+        }
+        if (flag) {
+          try {
+            variablesObj[type_].push(var_);
+          } catch (e) {
+            variablesObj[type_] = [var_];
+          }
+        }
+        variable = var_;
+      }
+      if (isValidVariable(variable)) {
+        try {
+          variablesObj[RemoveSpaces(getDataType(type))].push(variable);
+        } catch (e) {
+          variablesObj[RemoveSpaces(getDataType(type))] = [variable];
+        }
+      }
+    });
+  });
+  return variablesObj;
+};
+
+/**
+ * This functions does what you think it does... It removes space from a
+ * given string.
+ * @param {*} text
+ * @returns String
+ */
+const RemoveSpaces = (text) => {
+  let k = "";
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] !== "$%") {
+      k += text[i];
+    }
+  }
+  return k;
+};
+
+/**
+ *
+ * This function collects the names of class & struct identifiers and
+ * return an array of @Main class object.
+ * @param {*} words
+ * @returns Array
+ */
 const ClassifyClassesAndStructs = (words) => {
-  /**
-   *  This function collects the names of class & struct identifiers and
-   *  return an array of @Main class object.
-   */
   let arr = [];
   words.map((item, index) => {
     // TODO: Find a method to classify "METHODS".
@@ -184,18 +431,26 @@ const ClassifyClassesAndStructs = (words) => {
   return arr;
 };
 
+/**
+ * Reads folder content & return it.
+ * @param {*} fs
+ * @param {*} path
+ * @param {*} filepath
+ * @returns String
+ */
 const getFolderContents = (fs, path, filepath) => {
-  /**
-   *  Reads folder content & return it.
-   */
   const formattedPath = filepath.split(path.posix.sep).join(path.win32.sep);
   return fs.readdirSync(formattedPath);
 };
 
+/**
+ * This function returns the contents of a current directory.
+ * @param {*} fs
+ * @param {*} path
+ * @param {*} dirname
+ * @returns Array
+ */
 const getDirContents = (fs, path, dirname) => {
-  /**
-   *  This function returns the contents of a current directory.
-   */
   const filepath = dirname.slice(
     dirname[0] == "/" ? 1 : 0,
     dirname.lastIndexOf("/")
@@ -222,11 +477,14 @@ const getDirContents = (fs, path, dirname) => {
   }
 };
 
+/**
+ * This is a utility function to spread sub-arrays and
+ * append their content to the main array.
+ * @param {*} arr
+ * @param {*} res
+ * @returns Array
+ */
 const SpreadArray = (arr, res) => {
-  /**
-   *  This is a utility function to spread sub-arrays and
-   *  append their content to the main array.
-   */
   try {
     arr.map((item) => {
       let k = SpreadArray(item, res);
@@ -240,12 +498,16 @@ const SpreadArray = (arr, res) => {
   }
 };
 
+/**
+ * This function mainly collects class & Struct names from
+ * headers file that currently exists within the same directory
+ * and within any sub-directory.
+ * @param {*} fs
+ * @param {*} path
+ * @param {*} dirname
+ * @returns Promise
+ */
 const CollectAllIdentifiers = (fs, path, dirname) => {
-  /*
-    This function mainly collects class & Struct names from
-    headers file that currently exists within the same directory
-    and within any sub-directory.
-  */
   let dirContents = SpreadArray(getDirContents(fs, path, dirname), [])[0];
   let fileObj = {};
   return new Promise((resolve, reject) => {
@@ -271,4 +533,6 @@ module.exports = {
   TextToWordsArray,
   ClassifyClassesAndStructs,
   CollectAllIdentifiers,
+  getVariablesObject,
+  checkType,
 };

@@ -1,27 +1,59 @@
+/**
+ *  This extension utilizes this object to provide headers for keywords.
+ *  Notations of 'type':
+ *        @0 : STL containers
+ *        @1 : Classes & Objects
+ *        @2 : Functions
+ */
+//TODO: This needs to be extended.
 const keywords = {
-  cout: "iostream",
-  cin: "iostream",
-  sort: "algorithm",
-  setprecision: "iomanip",
-  vector: "vector",
-  set: "set",
-  map: "map",
-  unordered_map: "map",
-  ceil: "cmath",
-  floor: "cmath",
-  abs: "cmath",
-  round: "cmath",
-  upper_bound: "algorithm",
-  lower_bound: "algorithm",
-  max_element: "algorithm",
-  min_element: "algorithm",
-  count: "algorithm",
-  queue: "queue",
-  deque: "queue",
-  priority_queue: "queue",
-  memset: "cstring",
-  stringstream: "string",
-  clock: "chrono",
+  cout: { header: "iostream", type: 1 },
+  cin: { header: "iostream", type: 1 },
+  sort: { header: "algorithm", type: 2 },
+  setprecision: {
+    header: "iomanip",
+    type: 2,
+    params: [["double", "int", "float"]],
+  },
+  vector: { header: "vector", type: 0 },
+  set: { header: "set", type: 0 },
+  map: { header: "map", type: 0 },
+  unordered_map: { header: "map", type: 0 },
+  ceil: { header: "cmath", type: 2, params: [["double", "int", "float"]] },
+  floor: { header: "cmath", type: 2, params: [["double", "int", "float"]] },
+  abs: { header: "cmath", type: 2, params: [["double", "int", "float"]] },
+  round: { header: "cmath", type: 2, params: [["double", "int", "float"]] },
+  upper_bound: {
+    header: "algorithm",
+    type: 2,
+    params: ["iterator", "iterator", "argv"],
+  },
+  lower_bound: {
+    header: "algorithm",
+    type: 2,
+    params: ["iterator", "iterator", "argv"],
+  },
+  max_element: {
+    header: "algorithm",
+    type: 2,
+    params: ["iterator", "iterator", "argv"],
+  },
+  min_element: {
+    header: "algorithm",
+    type: 2,
+    params: ["iterator", "iterator", "argv"],
+  },
+  count: {
+    header: "algorithm",
+    type: 2,
+    params: ["iterator", "iterator", "argv"],
+  },
+  queue: { header: "queue", type: 0 },
+  deque: { header: "queue", type: 0 },
+  priority_queue: { header: "queue", type: 0 },
+  memset: { header: "cstring", type: 2, params: [["int", "bool"], "sizeof"] },
+  stringstream: { header: "string", type: 1 },
+  clock: { header: "chrono", type: 2, params: [] },
 };
 
 module.exports = {
