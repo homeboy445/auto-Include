@@ -7,7 +7,11 @@ const {
   CollectAllIdentifiers,
   getVariablesObject,
   checkType,
+  getIncludedHeaders,
+  getStandardHeadersObject,
+  CollectAllHeaders,
 } = require("./utility");
+const { Queue } = require("./tools");
 const fs = require("fs");
 const path = require("path");
 
@@ -18,20 +22,18 @@ const path = require("path");
 function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "autoinclude.autoInclude",
-    function () {
+    () => {
       const editor = vscode.window.activeTextEditor;
       if (editor.document.languageId !== "cpp") {
         return vscode.window.showInformationMessage("File type not supported!");
       }
-      vscode.commands.executeCommand("editor.action.selectAll").then(() => {
+      vscode.commands.executeCommand("editor.action.selectAll").then(async () => {
         vscode.window.showInformationMessage(
           "Including required libraries & removing unused ones..."
         );
         let text = editor.document.getText(editor.selection);
         let headers = new Set(),
           words = TextToWordsArray(text);
-        let variablesObj = getVariablesObject(words);
-        console.log(variablesObj);
         for (const key in keywords) {
           words.map((item, index) => {
             let foundAt = item.lastIndexOf(key);
@@ -43,6 +45,49 @@ function activate(context) {
           });
         }
         text = RemoveUnusedHeaders(words, keywords);
+        headers = await CollectAllHeaders(fs, path, editor.document.uri.path)
+          .then((filesObj) => {
+            const queue = new Queue();
+            const headerObj = getStandardHeadersObject(keywords);
+            let redundantInclude = new Set();
+            let Visited = {};
+            getIncludedHeaders(words).map((item) => {
+              queue.push_front(item);
+            });
+            /**
+             * Applying Breadth First Search to check if the header that is to be included is redundant or not
+             * by checking if it has already been included in one of the included headers.
+             */
+            while (!queue.is_empty()) {
+              let element = queue.front();
+              redundantInclude.add(element);
+              queue.pop_front();
+              if (headerObj[element] || Visited[element] === true) {
+                Visited[element] = true;
+                continue;
+              } else {
+                for (const file in filesObj) {
+                  if (file.lastIndexOf(element) !== -1) {
+                    filesObj[file].map((item) => {
+                      queue.push_front(item);
+                    });
+                  }
+                }
+                Visited[element] = true;
+              }
+            }
+            let s = new Set();
+            [...headers].map((item) => {
+              if (Visited[item]) {
+                return null;
+              }
+              return s.add(item);
+            });
+            return s;
+          })
+          .catch((e) => {
+            return headers;
+          });
         let str = "";
         [...headers].map((item) => {
           let flag = true;

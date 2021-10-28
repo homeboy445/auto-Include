@@ -5,7 +5,6 @@
  *        @1 : Classes & Objects
  *        @2 : Functions
  */
-//TODO: This needs to be extended.
 const keywords = {
   cout: { header: "iostream", type: 1 },
   cin: { header: "iostream", type: 1 },

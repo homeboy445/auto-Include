@@ -7,6 +7,28 @@ class Main {
 }
 
 /**
+ * This function returns the object including the standard library headers as its keys.
+ * @param {*} keywords
+ * @returns Object
+ */
+const getStandardHeadersObject = (keywords) => {
+  let headerObject = {};
+  for (const key in keywords) {
+    try {
+      headerObject[keywords[key].header].push({
+        element: key,
+        type: keywords[key].type,
+      });
+    } catch (e) {
+      headerObject[keywords[key].header] = [
+        { element: key, type: keywords[key].type },
+      ];
+    }
+  }
+  return headerObject;
+};
+
+/**
  * This function mainly aims at removing any and all headers that are not
  * currently being used in the program.
  * @param {*} words
@@ -38,19 +60,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
   };
 
   let includedHeaders = new Set();
-  let headerObject = {};
-  for (const key in keywords) {
-    try {
-      headerObject[keywords[key].header].push({
-        element: key,
-        type: keywords[key].type,
-      });
-    } catch (e) {
-      headerObject[keywords[key].header] = [
-        { element: key, type: keywords[key].type },
-      ];
-    }
-  }
+  let headerObject = getStandardHeadersObject(keywords);
   let iterator = 0;
   words.map((item, index) => {
     iterator = item === "using" ? index : iterator;
@@ -118,8 +128,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
 };
 
 /**
- * This function checks if the matched substring is actually a keyword
- * or not.
+ * This function checks if the matched substring is actually a keyword or not.
  * @param {*} words
  * @param {*} keyword
  * @param {*} index
@@ -394,8 +403,7 @@ const RemoveSpaces = (text) => {
 
 /**
  *
- * This function collects the names of class & struct identifiers and
- * return an array of @Main class object.
+ * This function collects the names of class & struct identifiers and return an array of @Main class object.
  * @param {*} words
  * @returns Array
  */
@@ -478,8 +486,7 @@ const getDirContents = (fs, path, dirname) => {
 };
 
 /**
- * This is a utility function to spread sub-arrays and
- * append their content to the main array.
+ * This is a utility function to spread sub-arrays and append their content to the main array.
  * @param {*} arr
  * @param {*} res
  * @returns Array
@@ -496,6 +503,36 @@ const SpreadArray = (arr, res) => {
   } catch (e) {
     return [arr, 1];
   }
+};
+
+/**
+ * This function returns an array of all the currently included headers within the program.
+ * @param {*} words
+ * @returns Array
+ */
+const getIncludedHeaders = (words) => {
+  let headers = new Set();
+  words.map((item, index) => {
+    if (item === "" || item === undefined) {
+      return null;
+    }
+    try {
+      if (item.lastIndexOf("#include") !== -1) {
+        for (let it = index; it < words.length; it++) {
+          let a = words[it].lastIndexOf('"'),
+            b = words[it].lastIndexOf("<");
+          if (a !== -1) {
+            return headers.add(words[it].split('"')[1]);
+          } else if (b !== -1) {
+            return headers.add(words[it].split("<")[1].split(">")[0]);
+          }
+        }
+      }
+    } catch (e) {
+      return null;
+    }
+  });
+  return [...headers];
 };
 
 /**
@@ -520,7 +557,34 @@ const CollectAllIdentifiers = (fs, path, dirname) => {
           );
         }
       } catch (e) {
-        return null;
+        return reject(e);
+      }
+    });
+    resolve(fileObj);
+  });
+};
+
+/**
+ * This function collects & returns all the included headers within the current directory.
+ * @param {*} fs
+ * @param {*} path
+ * @param {*} dirname
+ * @returns Promise
+ */
+const CollectAllHeaders = (fs, path, dirname) => {
+  let dirContents = SpreadArray(getDirContents(fs, path, dirname), [])[0];
+  let fileObj = {};
+  return new Promise((resolve, reject) => {
+    dirContents.map((file) => {
+      let filetype = file.slice(file.lastIndexOf(".") + 1);
+      try {
+        if (filetype === "hpp" || filetype === "h" || filetype === "hxx") {
+          fileObj[file] = getIncludedHeaders(
+            TextToWordsArray(fs.readFileSync(file, "utf8"))
+          );
+        }
+      } catch (e) {
+        return reject(e);
       }
     });
     resolve(fileObj);
@@ -535,4 +599,7 @@ module.exports = {
   CollectAllIdentifiers,
   getVariablesObject,
   checkType,
+  getIncludedHeaders,
+  getStandardHeadersObject,
+  CollectAllHeaders,
 };
