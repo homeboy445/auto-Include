@@ -47,8 +47,11 @@ const RemoveUnusedHeaders = (words, keywords) => {
     let flag = false;
     try {
       (headerArray || []).map((item) => {
-        if (target.lastIndexOf(item.element) !== -1) {
-          if (checkType(words, { header: header, type: item.type }, index)) {
+        let idx = target.lastIndexOf(item.element);
+        if (idx !== -1) {
+          if (
+            checkType(words, { header: header, type: item.type }, index, idx)
+          ) {
             flag = true;
           }
         }
@@ -134,12 +137,16 @@ const RemoveUnusedHeaders = (words, keywords) => {
  * @param {*} index
  * @returns boolean
  */
-const checkType = (words, keyword, index) => {
+const checkType = (words, keyword, index, foundAt) => {
   switch (keyword.type) {
     case 0: {
       let it,
-        str = "";
-      for (it = index; it < words.length; it++) {
+        str = "",
+        ix;
+      for (ix = foundAt; ix < words[index].length; ix++) {
+        str += words[index][ix];
+      }
+      for (it = index + 1; it < words.length; it++) {
         str += words[it];
         if (words[it].lastIndexOf(";") !== -1) {
           break;
@@ -158,6 +165,9 @@ const checkType = (words, keyword, index) => {
           } else {
             stack.push(">");
           }
+        }
+        if (flag && stack.length === 0) {
+          break;
         }
       }
       if (flag) {

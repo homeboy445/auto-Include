@@ -37,8 +37,8 @@ function activate(context) {
         for (const key in keywords) {
           words.map((item, index) => {
             let foundAt = item.lastIndexOf(key);
-            if (foundAt !== -1) {
-              if (checkType(words, keywords[key], index)) {
+            if (foundAt !== -1 && item.lastIndexOf("#include") === -1) {
+              if (checkType(words, keywords[key], index, foundAt)) {
                 headers.add(keywords[key].header);
               }
             }
