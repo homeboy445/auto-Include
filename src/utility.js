@@ -545,6 +545,13 @@ const getIncludedHeaders = (words) => {
   return [...headers];
 };
 
+const getAllFunctions = (words) => {
+  const functions = [];
+  words.map((item, index)=>{
+    return;
+  })
+}
+
 /**
  * This function mainly collects class & Struct names from
  * headers file that currently exists within the same directory
@@ -600,6 +607,26 @@ const CollectAllHeaders = (fs, path, dirname) => {
     resolve(fileObj);
   });
 };
+
+const collectAllFunctions = (fs, path, dirname) => {
+  let dirContents = SpreadArray(getDirContents(fs, path, dirname), [])[0];
+  let fileObj = {};
+  return new Promise((resolve, reject) => {
+    dirContents.map((file) => {
+      let filetype = file.slice(file.lastIndexOf(".") + 1);
+      try {
+        if (filetype === "hpp" || filetype === "h" || filetype === "hxx") {
+          fileObj[file] = getIncludedHeaders(
+            TextToWordsArray(fs.readFileSync(file, "utf8"))
+          );
+        }
+      } catch (e) {
+        return reject(e);
+      }
+    });
+    resolve(fileObj);
+  });
+}
 
 module.exports = {
   Main,
