@@ -1,3 +1,5 @@
+const { BroadcastChannel } = require("worker_threads");
+
 /** Class for handling identifiers. */
 class Main {
   constructor(name, type) {
@@ -137,7 +139,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
  * @param {*} index
  * @returns boolean
  */
-const checkType = (words, keyword, index, foundAt) => {
+const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
   switch (keyword.type) {
     case 0: {
       let it,
@@ -170,38 +172,75 @@ const checkType = (words, keyword, index, foundAt) => {
           break;
         }
       }
-      if (flag) {
-        if (stack.length === 0) {
+      if (flag && stack.length === 0) {
+        if (
+          (words[index].lastIndexOf("std::") !== -1 && foundAt === 5) ||
+          (is_std_used && foundAt === 0)
+        ) {
           return true;
         }
       }
       break;
     }
     case 1: {
-      let s = "";
-      if (item.lastIndexOf("::") !== -1) {
-        let it = index - 1;
-        while (it >= 0) {
-          if (words[it] === " ") {
-            continue;
-          }
-          s = words[it];
-          break;
-        }
-        s += "::";
-      }
       if (
-        key.length === item.length ||
-        s === "std::" ||
-        item.slice(0, item.length - key.length) === "std::"
+        (words[index].lastIndexOf("std::") !== -1 && foundAt === 5) ||
+        (is_std_used && foundAt === 0)
       ) {
         return true;
       }
       break;
     }
     case 2: {
-      break;
+      let dataStr = "",
+        keyword_ = "";
+      let temp = "";
+      for (let j = index - 1; j >= 0; j--) {
+        if (words[j] === "$%") {
+          continue;
+        }
+        if (words[j] === "@") {
+          break;
+        }
+        temp = words[j];
+        break;
+      }
+      console.log(">>> ", temp, " ", words[index]);
+      if (temp.lastIndexOf(";") === -1 && temp !== "") {
+        return false;
+      }
+      for (let i = index; i < words.length; i++) {
+        dataStr += words[i];
+        if (words[i].lastIndexOf(";") !== -1) {
+          break;
+        }
+      }
+      for (let i = foundAt; i < dataStr.length; i++) {
+        if (dataStr[i] === "(" || dataStr[i] === ";") {
+          break;
+        }
+        if (dataStr[i] === "*") {
+          continue;
+        }
+        keyword_ += dataStr[i];
+      }
+      if (
+        !(
+          keyword_ === key &&
+          (foundAt === 0 || (dataStr[0] === "*" && foundAt === 1))
+        )
+      ) {
+        return false;
+      }
+      console.log(
+        "===>",
+        extractParamAndName(
+          removeSpaces(dataStr.slice(foundAt, dataStr.lastIndexOf(";")))
+        )
+      );
     }
+    default:
+      return false;
   }
   return false;
 };
@@ -259,21 +298,27 @@ const getVariablesObject = (words) => {
   };
 
   const getDataType = (type) => {
-    let idx = type.lastIndexOf("::");
+    let idx = type.lastIndexOf("<");
     if (idx !== -1) {
-      type = type.slice(idx + 2);
+      type = type.slice(0, idx);
     }
-    if (type.lastIndexOf("<") !== -1) {
-      let ss = "";
-      for (let i = 0; i < type.length; i++) {
-        if (type[i] === "<") {
-          break;
-        }
-        ss += type[i];
+    for (let i = 0; i < type.length; i++) {
+      let c = type[i];
+      if (c.toLowerCase() === c.toUpperCase()) {
+        return [type, false];
       }
-      type = ss;
     }
-    return type;
+    return [type, true];
+  };
+
+  const removeSemiColon = (text) => {
+    let s = "";
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] !== ";") {
+        s += text[i];
+      }
+    }
+    return s;
   };
 
   let variablesObj = {},
@@ -348,9 +393,9 @@ const getVariablesObject = (words) => {
       varStr = item;
     }
     let arr = varStr.split(",");
-    arr = arr.map((item) => {
-      item = item.replace(/#/g, ",");
-      let variable = item.split("=")[0];
+    arr = arr.map((item2) => {
+      item2 = item2.replace(/#/g, ",");
+      let variable = item2.split("=")[0];
       variable = variable.split("$%");
       if (variable.length === 3) {
         variable = variable[1];
@@ -384,10 +429,14 @@ const getVariablesObject = (words) => {
         variable = var_;
       }
       if (isValidVariable(variable)) {
+        let d_type = getDataType(type);
+        if (!d_type[1]) {
+          return null;
+        }
         try {
-          variablesObj[RemoveSpaces(getDataType(type))].push(variable);
+          variablesObj[removeSpaces(d_type[0])].push(variable);
         } catch (e) {
-          variablesObj[RemoveSpaces(getDataType(type))] = [variable];
+          variablesObj[removeSpaces(d_type[0])] = [variable];
         }
       }
     });
@@ -401,14 +450,22 @@ const getVariablesObject = (words) => {
  * @param {*} text
  * @returns String
  */
-const RemoveSpaces = (text) => {
-  let k = "";
+const removeSpaces = (text) => {
+  let newTxt = "";
   for (let i = 0; i < text.length; i++) {
-    if (text[i] !== "$%") {
-      k += text[i];
+    if (text[i] === "$" && i + 1 < text.length) {
+      if (text[i + 1] === "%") {
+        continue;
+      }
     }
+    if (text[i] === "%" && i - 1 >= 0) {
+      if (text[i - 1] === "$") {
+        continue;
+      }
+    }
+    newTxt += text[i];
   }
-  return k;
+  return newTxt;
 };
 
 /**
@@ -545,15 +602,55 @@ const getIncludedHeaders = (words) => {
   return [...headers];
 };
 
-const getAllFunctions = (words) => {
-  const functions = [];
-  words.map((item, index)=>{
-    return;
-  })
-}
+/**
+ * This functions extracts the name of the function & its params.
+ * @param {*} func
+ * @returns Object
+ */
+const extractParamAndName = (func) => {
+  let brck = [];
+  let str = "",
+    functionName = "",
+    paramString = "";
+  for (let i = 0; i < func.length; i++) {
+    if (func[i] === "{") {
+      //This code can be refactored.
+      brck.push(func[i]);
+    }
+    if (func[i] === "}" && brck[brck.length - 1] === "{") {
+      brck.pop();
+    }
+    if (func[i] === ",") {
+      if (brck.length !== 0) {
+        if (brck[0] === "{") {
+          str += "#";
+          continue;
+        }
+      }
+    }
+    str += func[i];
+  }
+  for (let i = 0, k = 0; i < str.length - 1; i++) {
+    if (str[i] === "(") {
+      k++;
+    }
+    if (k === 0) {
+      functionName += str[i];
+    } else {
+      if (k > 1) {
+        paramString += str[i];
+      }
+      k++;
+    }
+  }
+  return {
+    name: functionName,
+    params: paramString.split(",").map((item) => item.replace(/#/g, ",")),
+  };
+};
 
 /**
- * This function mainly collects class & Struct names from
+ * This function mainly collects class & struct names from
  * headers file that currently exists within the same directory
  * and within any sub-directory.
  * @param {*} fs
@@ -626,7 +723,7 @@ const collectAllFunctions = (fs, path, dirname) => {
     });
     resolve(fileObj);
   });
-}
+};
 
 module.exports = {
   Main,
@@ -639,4 +736,5 @@ module.exports = {
   getIncludedHeaders,
   getStandardHeadersObject,
   CollectAllHeaders,
+  removeSpaces,
 };
