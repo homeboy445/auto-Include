@@ -1,5 +1,3 @@
-const { BroadcastChannel } = require("worker_threads");
-
 /** Class for handling identifiers. */
 class Main {
   constructor(name, type) {
@@ -205,7 +203,6 @@ const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
         temp = words[j];
         break;
       }
-      console.log(">>> ", temp, " ", words[index]);
       if (temp.lastIndexOf(";") === -1 && temp !== "") {
         return false;
       }
@@ -232,12 +229,16 @@ const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
       ) {
         return false;
       }
-      console.log(
-        "===>",
-        extractParamAndName(
-          removeSpaces(dataStr.slice(foundAt, dataStr.lastIndexOf(";")))
-        )
+      let func = extractParamAndName(
+        removeSpaces(dataStr.slice(foundAt, dataStr.lastIndexOf(";")))
       );
+      if (
+        func.params.length === keyword.params.length &&
+        ((words[index].lastIndexOf("std::") !== -1 && foundAt === 5) ||
+          (is_std_used && foundAt === 0))
+      ) {
+        return true;
+      }
     }
     default:
       return false;

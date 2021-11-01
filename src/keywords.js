@@ -4,11 +4,12 @@
  *        @0 : STL containers
  *        @1 : Classes & Objects
  *        @2 : Functions
+ *  argv : "Any type"
  */
 const keywords = {
   cout: { header: "iostream", type: 1 },
   cin: { header: "iostream", type: 1 },
-  sort: { header: "algorithm", type: 2 },
+  sort: { header: "algorithm", type: 2, params: ["iterator", "iterator"]},
   setprecision: {
     header: "iomanip",
     type: 2,
