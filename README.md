@@ -14,7 +14,7 @@ Automatically include & remove standard C++ headers accordingly to your use-case
 <br />
 
 ## Usage
-Just do `ctrl + shift + p` and choose `auto Include` and you're done(make sure the file type is cpp only).
+Just do `ctrl + shift + p` and choose `Auto Include` or you can just press 'F9'. (make sure the file type is cpp only).
 
 ## Requirements
 
