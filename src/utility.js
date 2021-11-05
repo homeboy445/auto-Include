@@ -33,11 +33,12 @@ const getStandardHeadersObject = (keywords) => {
  * currently being used in the program.
  * @param {*} words
  * @param {*} keywords
+ * @param {*} is_std_used
  * @returns String
  */
 const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
   words = ["@"].concat(words);
-  const find = (header, headerArray, target, index) => {
+  const find = (headerArray, target, index) => {
     /*
         This function will check if any keyword belonging to a particular
         header is within the target string. the method to acheive the former
@@ -50,7 +51,15 @@ const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
         let idx = target.lastIndexOf(item.element);
         if (idx !== -1) {
           if (
-            checkType(words, { header: header, type: item.type }, index, idx, item.element, is_std_used)
+            !flag &&
+            checkType(
+              words,
+              keywords[item.element],
+              index,
+              idx,
+              item.element,
+              is_std_used
+            )
           ) {
             flag = true;
           }
@@ -95,7 +104,7 @@ const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
   [...includedHeaders].map((item) => {
     let flag = false;
     for (let it = iterator; it < words.length; it++) {
-      flag |= find(item.header, headerObject[item.header], words[it], it);
+      flag |= find(headerObject[item.header], words[it], it);
     }
     if (!flag) {
       exclude.add(item.index);
@@ -212,6 +221,7 @@ const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
           break;
         }
       }
+      dataStr = removeSpaces(dataStr);
       for (let i = foundAt; i < dataStr.length; i++) {
         if (dataStr[i] === "(" || dataStr[i] === ";") {
           break;
@@ -223,12 +233,16 @@ const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
       }
       if (
         !(
-          keyword_ === key &&
-          (foundAt === 0 || (dataStr[0] === "*" && foundAt === 1))
+          (keyword_ === key &&
+            (foundAt === 0 || (dataStr[0] === "*" && foundAt === 1)) &&
+            is_std_used) ||
+          ((foundAt === 5 || (dataStr[0] === "*" && foundAt === 6)) &&
+            dataStr.lastIndexOf("std::") !== -1)
         )
       ) {
         return false;
       }
+      //TODO: Extend param matching functionality.
       let func = extractParamAndName(
         removeSpaces(dataStr.slice(foundAt, dataStr.lastIndexOf(";")))
       );
