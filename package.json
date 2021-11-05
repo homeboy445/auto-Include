@@ -1,8 +1,8 @@
 {
 	"name": "autoinclude",
-	"displayName": "auto Include",
+	"displayName": "Auto Include",
 	"publisher": "homeboy445",
-	"description": "Automatically include & remove C++ headers accordingly.",
+	"description": "Automatically include & remove standard C++ headers accordingly.",
 	"repository": {
 		"url": "https://github.com/homeboy445/auto-Include"
 	},
@@ -22,9 +22,16 @@
 		"commands": [
 			{
 				"command": "autoinclude.autoInclude",
-				"title": "auto Include"
+				"title": "Auto Include"
 			}
-		]
+		],
+		"keybindings": [
+            {
+                "command": "autoinclude.autoInclude",
+                "key": "F9",
+                "mac": "F9"
+            }
+        ]
 	},
 	"keywords": [
 		"C++",

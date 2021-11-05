@@ -51,7 +51,6 @@ const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
         let idx = target.lastIndexOf(item.element);
         if (idx !== -1) {
           if (
-            !flag &&
             checkType(
               words,
               keywords[item.element],
@@ -94,7 +93,7 @@ const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
         }
         header += lineStr[k];
       }
-      if (header !== "iostream" && headerObject[header] !== undefined) {
+      if (headerObject[header] !== undefined) {
         includedHeaders.add({ header: header, index: index });
       }
     }
