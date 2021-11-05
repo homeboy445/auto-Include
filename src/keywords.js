@@ -36,12 +36,12 @@ const keywords = {
   max_element: {
     header: "algorithm",
     type: 2,
-    params: ["iterator", "iterator", "argv"],
+    params: ["iterator", "iterator"],
   },
   min_element: {
     header: "algorithm",
     type: 2,
-    params: ["iterator", "iterator", "argv"],
+    params: ["iterator", "iterator"],
   },
   count: {
     header: "algorithm",

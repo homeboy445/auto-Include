@@ -50,16 +50,15 @@ const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
       (headerArray || []).map((item) => {
         let idx = target.lastIndexOf(item.element);
         if (idx !== -1) {
-          if (
-            checkType(
-              words,
-              keywords[item.element],
-              index,
-              idx,
-              item.element,
-              is_std_used
-            )
-          ) {
+          let k = checkType(
+            words,
+            keywords[item.element],
+            index,
+            idx,
+            item.element,
+            is_std_used
+          );
+          if (k) {
             flag = true;
           }
         }
@@ -247,8 +246,9 @@ const checkType = (words, keyword, index, foundAt, key, is_std_used) => {
       );
       if (
         func.params.length === keyword.params.length &&
-        ((words[index].lastIndexOf("std::") !== -1 && foundAt === 5) ||
-          (is_std_used && foundAt === 0))
+        ((words[index].lastIndexOf("std::") !== -1 &&
+          (dataStr[0] === "*" ? foundAt === 6 : foundAt === 5)) ||
+          (is_std_used && (dataStr[0] === "*" ? foundAt === 1 : foundAt === 0)))
       ) {
         return true;
       }
