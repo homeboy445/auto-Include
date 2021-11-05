@@ -54,6 +54,17 @@ const keywords = {
   memset: { header: "cstring", type: 2, params: [["int", "bool"], "sizeof"] },
   stringstream: { header: "string", type: 1 },
   clock: { header: "chrono", type: 2, params: [] },
+  array: {header:"array", type: 0},
+  deque: {header:"deque", type:0},
+  list: {header:"list", type:0},
+  forward_list: {header:"forward_list", type:0},
+  span: {header:"span", type:0},
+  dynamic_extent: {header:"span", type: 0},
+  stack: {header: "stack", type: 0},
+  uses_allocator: {header: "stack", type: 0},
+  unordered_map : {header:"unordered_map", type: 0},
+  unordered_multimap : {header:"unordered_map", type: 0},
+  for_each: {header:"algorithm", type:2 , params: ["iterator", "iterator", "argv"]}
 };
 
 module.exports = {
