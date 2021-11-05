@@ -37,18 +37,18 @@ function activate(context) {
           let text = editor.document.getText(editor.selection);
           let headers = new Set(),
             words = TextToWordsArray(text);
+          let is_std_used = text.lastIndexOf("using namespace std;");
           for (const key in keywords) {
             words.map((item, index) => {
               let foundAt = item.lastIndexOf(key);
               if (foundAt !== -1 && item.lastIndexOf("#include") === -1) {
-                let status = text.lastIndexOf("using namespace std;");
-                if (checkType(words, keywords[key], index, foundAt, key, status !== -1)) {
+                if (checkType(words, keywords[key], index, foundAt, key, is_std_used !== -1)) {
                   headers.add(keywords[key].header);
                 }
               }
             });
           }
-          text = RemoveUnusedHeaders(words, keywords);
+          text = RemoveUnusedHeaders(words, keywords, is_std_used !== -1);
           headers = await CollectAllHeaders(fs, path, editor.document.uri.path)
             .then((filesObj) => {
               const queue = new Queue();

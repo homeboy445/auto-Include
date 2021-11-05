@@ -35,7 +35,7 @@ const getStandardHeadersObject = (keywords) => {
  * @param {*} keywords
  * @returns String
  */
-const RemoveUnusedHeaders = (words, keywords) => {
+const RemoveUnusedHeaders = (words, keywords, is_std_used) => {
   words = ["@"].concat(words);
   const find = (header, headerArray, target, index) => {
     /*
@@ -50,7 +50,7 @@ const RemoveUnusedHeaders = (words, keywords) => {
         let idx = target.lastIndexOf(item.element);
         if (idx !== -1) {
           if (
-            checkType(words, { header: header, type: item.type }, index, idx)
+            checkType(words, { header: header, type: item.type }, index, idx, item.element, is_std_used)
           ) {
             flag = true;
           }
