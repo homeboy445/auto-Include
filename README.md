@@ -1,4 +1,4 @@
-# auto Include
+# Auto Include
 
 Automatically include & remove standard C++ headers accordingly to your use-case. Now, you don't have to worry about all those headers that you constantly need to include or remove, this extension will do all that for you - giving you a smooth C++ programming experience.
 
@@ -14,7 +14,7 @@ Automatically include & remove standard C++ headers accordingly to your use-case
 <br />
 
 ## Usage
-Just do `ctrl + shift + p` and choose `Auto Include` or you can just press 'F9'. (make sure the file type is cpp only).
+Just do `ctrl + shift + p` and choose `Auto Include` or you can just press `F9`. (make sure the file type is cpp only).
 
 ## Requirements
 
