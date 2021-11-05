@@ -4,8 +4,6 @@ Automatically include & remove C++ headers accordingly to your use-case. Now, yo
 
 #### Note: This extension's current support is limited to standard library headers only.
 
-#### Caution: This extension is still under development & needs extensive testing before it can be considered fully working and so, it might show some unexpected behavior on execution.
-
 ## Features
 
 ### Auto include any C++ header(s) if you're using it's functionality,
